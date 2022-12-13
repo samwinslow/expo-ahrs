@@ -24,7 +24,7 @@ export default function App() {
 
   return (
     <View style={styles.container} onLayout={onLayout}>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <LocationInfo />
     </View>
   )
