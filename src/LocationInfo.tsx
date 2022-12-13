@@ -1,12 +1,16 @@
 import { useState, useEffect, useMemo, FC } from 'react'
 
 import * as Location from 'expo-location'
-import { Alert, Text, View } from 'react-native'
-import { KNOTS_TO_MPH, MPERSEC_TO_KNOTS } from './Constants'
+import { Alert, Text, useWindowDimensions, View } from 'react-native'
+import { KNOTS_TO_MPH, MPERSEC_TO_KNOTS, METERS_TO_FEET } from './Constants'
 import HeadingIndicator from './HeadingIndicator'
-import { isDefined } from './utils'
+import { formatFeet, isDefined, roundToNearestMultiple } from './utils'
+import { BaseText, SmallText } from './components/Text'
+import { styles } from './styles'
 
 const LocationInfo: FC = () => {
+  const { width } = useWindowDimensions()
+
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [heading, setHeading] = useState<number | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
@@ -51,6 +55,22 @@ const LocationInfo: FC = () => {
     groundSpeedKnots ? groundSpeedKnots * KNOTS_TO_MPH : null
   , [groundSpeedKnots])
 
+  const deviceAltitude = useMemo(() => {
+    const rawAltitude = location?.coords?.altitude
+    if (!isDefined(rawAltitude) || rawAltitude === -1) {
+      return null
+    }
+    return rawAltitude * METERS_TO_FEET
+  }, [location?.coords?.altitude])
+
+  const altitudeTolerance = useMemo(() => {
+    const rawAccuracy = location?.coords?.altitudeAccuracy
+    if (!isDefined(rawAccuracy) || rawAccuracy === -1) {
+      return null
+    }
+    return rawAccuracy * METERS_TO_FEET
+  }, [location?.coords?.accuracy])
+
   const track = useMemo(() => {
     // NB: coords.heading is a misnomer, it's actually the track
     const rawTrack = location?.coords?.heading
@@ -62,10 +82,19 @@ const LocationInfo: FC = () => {
 
   return (
     <View>
-      {/* <Text>Location: {JSON.stringify(location)}</Text>
-      <Text>GS (kt): {groundSpeedKnots}</Text>
-      <Text>GS (mph): {groundSpeedStatute}</Text> */}
       <HeadingIndicator heading={heading ?? 0} track={track ?? 0} />
+      <View style={[styles.indicators, { width }]}>
+        <BaseText style={[styles.indicator, styles.left]}>
+          <SmallText>GS</SmallText>
+            {`\n${groundSpeedKnots?.toFixed(1) ?? '--'} `}
+          <SmallText>kt</SmallText>
+        </BaseText>
+        <BaseText style={[styles.indicator, styles.right]}>
+          <SmallText>EST. ALT</SmallText>
+          {`\n${deviceAltitude ? formatFeet(deviceAltitude) : '--'} `}
+          <SmallText>{altitudeTolerance ? `±${roundToNearestMultiple(altitudeTolerance, 5)} ft` : 'ft'}</SmallText>
+        </BaseText>
+      </View>
     </View>
   )
 }

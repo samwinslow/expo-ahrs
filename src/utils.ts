@@ -13,3 +13,7 @@ export const roundToNearestMultiple = (value: number, multiple: number) =>
   Math.round(value / multiple) * multiple
 export const formatDegrees = (value: number) =>
   `${Math.round(value)}`.padStart(3, '0')
+export const formatFeet = (value: number) => {
+  const feet = `${value.toFixed(0).padStart(5, '0')}`
+  return `${feet.slice(0, 2)} ${feet.slice(2)}`
+}

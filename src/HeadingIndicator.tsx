@@ -6,14 +6,15 @@ import { range as _range } from 'lodash'
 import { BaseText, SmallText } from './components/Text'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Colors } from './Constants'
+import { styles } from './styles'
 
 type HeadingIndicatorProps = {
   heading: number
   track: number
 }
 
-const getTick = (origin: SkPoint, radius: number, angle: number) => {
-  const length = getTickLength(angle)
+const getTick = (origin: SkPoint, radius: number, angle: number, length?: number) => {
+  length = length ?? getTickLength(angle)
   const x1 = origin.x + radius * sind(angle)
   const y1 = origin.y - radius * cosd(angle)
   const x2 = origin.x + (radius - length) * sind(angle)
@@ -103,6 +104,11 @@ const HeadingIndicator: FC<HeadingIndicatorProps> = ({ heading, track = 0 }) => 
     _range(0, 360, 5).flatMap(angle => getTick(origin.current, radius.current, angle)),
     [origin.current, radius.current]
   )
+  const bugPoints = useMemo(() =>
+    getTick(origin.current, radius.current, bug, 20),
+    [origin.current, radius.current, bug]
+  )
+
   const path = Skia.Path.Make();
   path.addCircle(origin.current.x, origin.current.y, radius.current - 64);
   const font = useFont(require('../assets/PT_Sans/PTSans-Regular.ttf'), 24)
@@ -113,11 +119,11 @@ const HeadingIndicator: FC<HeadingIndicatorProps> = ({ heading, track = 0 }) => 
   return (
     <View style={styles.container}>
       <View style={[styles.indicators, { width }]}>
-        <BaseText style={[styles.indicator, styles.hdg]}>
+        <BaseText style={[styles.indicator, styles.left, styles.hdg]}>
           <SmallText>HDG</SmallText>{`\n${formatDegrees(bug)}˚`}
         </BaseText>
         <BaseText style={[styles.indicator, styles.main]}>{formatDegrees(heading) + '˚'}</BaseText>
-        <BaseText style={[styles.indicator, styles.trk]}>
+        <BaseText style={[styles.indicator, styles.right, styles.trk]}>
           <SmallText>TRK</SmallText>{`\n${formatDegrees(track)}˚`}
         </BaseText>
       </View>
@@ -146,11 +152,18 @@ const HeadingIndicator: FC<HeadingIndicatorProps> = ({ heading, track = 0 }) => 
               strokeWidth={2}
             />
             <Line
-              p1={origin}
-              p2={bugPoint}
+              p1={bugPoints[0]}
+              p2={bugPoints[1]}
               color={Colors.YELLOW}
               style="stroke"
-              strokeWidth={2}
+              strokeWidth={16}
+            />
+            <Line
+              p1={bugPoints[0]}
+              p2={bugPoints[1]}
+              color={Colors.BACKGROUND}
+              style="stroke"
+              strokeWidth={4}
             />
             <Points
               points={cardinalPoints}
@@ -204,33 +217,3 @@ const HeadingIndicator: FC<HeadingIndicatorProps> = ({ heading, track = 0 }) => 
 }
 
 export default HeadingIndicator
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  indicators: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-  indicator: {
-    fontSize: 24,
-    width: 60,
-  },
-  main: {
-    textAlign: 'center',
-  },
-  hdg: {
-    color: Colors.YELLOW,
-    textAlign: 'left',
-    paddingLeft: 12,
-  },
-  trk: {
-    color: Colors.MAGENTA,
-    textAlign: 'right',
-    paddingRight: 12,
-  },
-})

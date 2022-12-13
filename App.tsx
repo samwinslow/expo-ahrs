@@ -4,6 +4,7 @@ import LocationInfo from './src/LocationInfo'
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { useCallback } from 'react'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -23,10 +24,14 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
-      <StatusBar style="light" />
-      <LocationInfo />
-    </View>
+    <SafeAreaProvider>
+      <View style={styles.container} onLayout={onLayout}>
+        <StatusBar style="light" />
+        <SafeAreaView>
+          <LocationInfo />
+        </SafeAreaView>
+      </View>
+    </SafeAreaProvider>
   )
 }
 
