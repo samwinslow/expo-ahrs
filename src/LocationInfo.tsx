@@ -4,6 +4,7 @@ import * as Location from 'expo-location'
 import { Alert, Text, View } from 'react-native'
 import { KNOTS_TO_MPH, MPERSEC_TO_KNOTS } from './Constants'
 import HeadingIndicator from './HeadingIndicator'
+import { isDefined } from './utils'
 
 const LocationInfo: FC = () => {
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
@@ -34,13 +35,25 @@ const LocationInfo: FC = () => {
     })
   }, [permissionStatus])
 
-  const groundSpeedKnots = useMemo(() =>
-    location?.coords.speed ? location.coords.speed * MPERSEC_TO_KNOTS : null
-  , [location?.coords])
+  const groundSpeedKnots = useMemo(() => {
+    const rawSpeed = location?.coords?.speed
+    if (!isDefined(rawSpeed) || rawSpeed === -1) {
+      return null
+    }
+    return rawSpeed * MPERSEC_TO_KNOTS
+  }, [location?.coords?.speed])
 
   const groundSpeedStatute = useMemo(() =>
     groundSpeedKnots ? groundSpeedKnots * KNOTS_TO_MPH : null
   , [groundSpeedKnots])
+
+  const heading = useMemo(() => {
+    const rawHeading = location?.coords?.heading
+    if (!isDefined(rawHeading) || rawHeading === -1) {
+      return null
+    }
+    return rawHeading
+  }, [location?.coords?.heading])
 
 
   return (
@@ -48,8 +61,7 @@ const LocationInfo: FC = () => {
       <Text>Location: {JSON.stringify(location)}</Text>
       <Text>GS (kt): {groundSpeedKnots}</Text>
       <Text>GS (mph): {groundSpeedStatute}</Text>
-      { location?.coords?.heading != null && <HeadingIndicator heading={location.coords.heading} />
-      }
+      <HeadingIndicator heading={heading ?? 0} />
     </View>
   )
 }
