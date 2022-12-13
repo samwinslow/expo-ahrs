@@ -8,6 +8,7 @@ import { isDefined } from './utils'
 
 const LocationInfo: FC = () => {
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
+  const [heading, setHeading] = useState<number | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
 
   const requestLocationPermission = async () => {
@@ -32,6 +33,9 @@ const LocationInfo: FC = () => {
       distanceInterval: 1
     }, (loc) => {
       setLocation(loc)
+    })
+    Location.watchHeadingAsync((hdg) => {
+      setHeading(hdg.magHeading)
     })
   }, [permissionStatus])
 
@@ -62,7 +66,7 @@ const LocationInfo: FC = () => {
       <Text>Location: {JSON.stringify(location)}</Text>
       <Text>GS (kt): {groundSpeedKnots}</Text>
       <Text>GS (mph): {groundSpeedStatute}</Text>
-      <HeadingIndicator heading={0} track={track ?? 0} />
+      <HeadingIndicator heading={heading ?? 0} track={track ?? 0} />
     </View>
   )
 }

@@ -8,7 +8,7 @@ type HeadingIndicatorProps = {
   track: number
 }
 
-const HeadingIndicator: FC<HeadingIndicatorProps> = ({ track = 0 }) => {
+const HeadingIndicator: FC<HeadingIndicatorProps> = ({ heading, track = 0 }) => {
   const { width } = useWindowDimensions()
 
   const viewStyle = useMemo(() => ({
@@ -25,6 +25,12 @@ const HeadingIndicator: FC<HeadingIndicatorProps> = ({ track = 0 }) => {
 
   const radius = useComputedValue(() => size.current.width / 2 - 16, [size.current.width])
 
+  const headingPoint = useComputedValue(() => {
+    const x = origin.current.x + radius.current * sind(heading)
+    const y = origin.current.y - radius.current * cosd(heading)
+    return vec(x, y)
+  }, [heading, radius.current, origin.current])
+
   const trackPoint = useComputedValue(() => {
     const x = origin.current.x + radius.current * sind(track)
     const y = origin.current.y - radius.current * cosd(track)
@@ -38,11 +44,18 @@ const HeadingIndicator: FC<HeadingIndicatorProps> = ({ track = 0 }) => {
           cx={origin.current.x}
           cy={origin.current.y}
           r={radius}
-          color="#AAA"
+          color="#222"
         />
         <Line
           p1={origin}
           p2={trackPoint}
+          color="#FF00AA"
+          style="stroke"
+          strokeWidth={2}
+        />
+        <Line
+          p1={origin}
+          p2={headingPoint}
           color="#FFF"
           style="stroke"
           strokeWidth={2}
