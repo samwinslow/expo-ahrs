@@ -47,12 +47,13 @@ const LocationInfo: FC = () => {
     groundSpeedKnots ? groundSpeedKnots * KNOTS_TO_MPH : null
   , [groundSpeedKnots])
 
-  const heading = useMemo(() => {
-    const rawHeading = location?.coords?.heading
-    if (!isDefined(rawHeading) || rawHeading === -1) {
+  const track = useMemo(() => {
+    // NB: coords.heading is a misnomer, it's actually the track
+    const rawTrack = location?.coords?.heading
+    if (!isDefined(rawTrack) || rawTrack === -1) {
       return null
     }
-    return rawHeading
+    return rawTrack
   }, [location?.coords?.heading])
 
 
@@ -61,7 +62,7 @@ const LocationInfo: FC = () => {
       <Text>Location: {JSON.stringify(location)}</Text>
       <Text>GS (kt): {groundSpeedKnots}</Text>
       <Text>GS (mph): {groundSpeedStatute}</Text>
-      <HeadingIndicator heading={heading ?? 0} />
+      <HeadingIndicator heading={0} track={track ?? 0} />
     </View>
   )
 }
