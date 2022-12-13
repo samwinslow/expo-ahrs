@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, FC } from 'react'
 
 import * as Location from 'expo-location'
 import { Alert, Text, View } from 'react-native'
 import { KNOTS_TO_MPH, MPERSEC_TO_KNOTS } from './Constants'
+import HeadingIndicator from './HeadingIndicator'
 
-export default function LocationInfo() {
+const LocationInfo: FC = () => {
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
 
@@ -47,6 +48,10 @@ export default function LocationInfo() {
       <Text>Location: {JSON.stringify(location)}</Text>
       <Text>GS (kt): {groundSpeedKnots}</Text>
       <Text>GS (mph): {groundSpeedStatute}</Text>
+      { location?.coords?.heading != null && <HeadingIndicator heading={location.coords.heading} />
+      }
     </View>
   )
 }
+
+export default LocationInfo
