@@ -60,12 +60,11 @@ const LocationInfo: FC = () => {
     return rawTrack
   }, [location?.coords?.heading])
 
-
   return (
     <View>
-      <Text>Location: {JSON.stringify(location)}</Text>
+      {/* <Text>Location: {JSON.stringify(location)}</Text>
       <Text>GS (kt): {groundSpeedKnots}</Text>
-      <Text>GS (mph): {groundSpeedStatute}</Text>
+      <Text>GS (mph): {groundSpeedStatute}</Text> */}
       <HeadingIndicator heading={heading ?? 0} track={track ?? 0} />
     </View>
   )
