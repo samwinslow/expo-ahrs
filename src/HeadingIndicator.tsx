@@ -82,7 +82,7 @@ const HeadingIndicator: FC<HeadingIndicatorProps> = ({ heading, track = 0 }) => 
     const dx = x - origin.current.x
     const dy = y - origin.current.y
     const theta = Math.atan2(dy, dx)
-    let angle = radToDeg(theta) - 270 + heading
+    let angle = radToDeg(theta) + heading + 90
     if (roundInterval) {
       angle = roundToNearestMultiple(angle, roundInterval)
     }
